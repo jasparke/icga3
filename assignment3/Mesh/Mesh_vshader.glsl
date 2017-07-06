@@ -1,8 +1,9 @@
-#version 330 core 
+#version 330 core
 in vec3 vpoint;
 in vec3 vnormal;
 
 out vec2 uv;
+out vec4 wpos;
 
 ///--- Uploaded by Eigen in C++
 uniform mat4 MODEL;
@@ -18,6 +19,7 @@ void main() {
 
     float displacement = texture(height_map, uv).r;
     vec4 world = MODEL * vec4(vpoint + vec3(0, displacement, 0), 1.0);
+	wpos = world;
     gl_Position = PROJ * VIEW * world;
 
 }
