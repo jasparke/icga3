@@ -52,7 +52,7 @@ void display() {
     float currentTime = glfwGetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
-
+    vec3 sun_dir = vec3(2*sin(0.5*currentTime), 2*cos(0.5*currentTime),0.0f).normalized();
     doKey(OpenGP::window);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -62,7 +62,7 @@ void display() {
     mat4 projection = OpenGP::perspective(FoV, scRatio, 0.1f, 100.0f);
     vec3 lookdir = cam_pos + cam_look;
     mat4 view = OpenGP::lookAt(cam_pos, lookdir, cam_up);
-    grid.draw(model, view, projection);
+    grid.draw(model, view, projection, sun_dir);
     sbox.draw(view, projection);
 }
 

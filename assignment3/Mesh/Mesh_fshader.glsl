@@ -3,6 +3,7 @@ out vec3 color;
 in vec4 wpos;
 in vec2 uv;
 
+uniform vec3 light;
 uniform sampler2D height_map;
 uniform sampler2D grass_map;
 uniform sampler2D snow_map;
@@ -10,7 +11,7 @@ uniform sampler2D rock_map;
 
 void main() {
 
-    float tiling_amount = 6;
+    float tiling_amount = 15;
 
     float height_center = texture(height_map, uv).r;
 
@@ -24,7 +25,7 @@ void main() {
 
     float normalAngle = acos(dot(vec3(0,1,0), N));
 
-    vec3 light = normalize(vec3(1,3,0));
+    //vec3 light = normalize(vec3(1,3,0));
 
     vec3 ambient = vec3(0.1, 0.1, 0.2);
 

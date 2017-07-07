@@ -149,7 +149,7 @@ public:
 
     }
 
-    void draw(mat4 Model, mat4 View, mat4 Projection){
+    void draw(mat4 Model, mat4 View, mat4 Projection, vec3 sun){
         glUseProgram(_pid);
         glBindVertexArray(_vao);
         check_error_gl();
@@ -179,6 +179,7 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(_pid, "MODEL"), 1, GL_FALSE, Model.data());
         glUniformMatrix4fv(glGetUniformLocation(_pid, "VIEW"), 1, GL_FALSE, View.data());
         glUniformMatrix4fv(glGetUniformLocation(_pid, "PROJ"), 1, GL_FALSE, Projection.data());
+        glUniform3fv(glGetUniformLocation(_pid, "light"), 1, sun.data());
 
         check_error_gl();
         ///--- Draw
