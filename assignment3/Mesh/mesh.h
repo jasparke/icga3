@@ -149,7 +149,7 @@ public:
 		OpenGP::imread("rockgrass.tga", image);
 
 		glGenTextures(1, &_rg_tex);
-		glBindTexture(GL_TEXTURE_2D, _snow_tex);
+		glBindTexture(GL_TEXTURE_2D, _rg_tex);
 
 		check_error_gl();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -21,29 +21,47 @@ void main() {
     vec3 a = vec3(pxs.x,height_plus_u - height_center, 0);
     vec3 b = vec3(0, height_plus_v - height_center, pxs.y);
     vec3 N = normalize(cross(b,a)); // Calculate normal from height differences
-    float slope = 1.0f - N.z;
+    float slope = 1.0f - N.y;
     float blendAmount;
 
     vec3 snowColor = texture(snow_map, uv * tiling_amount).rgb;
     vec3 grassColor = texture(grass_map, uv * tiling_amount).rgb;
-    vec3 rockColor = texture(rock_map, uv * tiling_amount).rgb;
+    vec3 rockColor = texture(rock_map, uv * tiling_amount).rgb * 0.7;
     vec3 rgColor = texture(rg_map, uv * tiling_amount).rgb;
 
-    vec3 grass_rock;
-    if (slope < 0.2) {
-        blendAmount = slope / 0.2f;
-        grass_rock = mix(grassColor, rgColor, blendAmount);
+    vec3 base_color;
+    if (slope < 0.3) {
+        if (height_center > 0.15f) base_color = snowColor;
+        else base_color = grassColor;
+
+    } if (slope < 0.4  && slope >= 0.3) {
+        blendAmount = (slope - 0.3f) * (1.0f / (0.4f - 0.3f));
+        if (height_center > 0.15f) base_color = mix(snowColor, rgColor, blendAmount);
+        else base_color = mix(grassColor, rgColor, blendAmount);
     }
-    if ( slope < 0.7 && slope >= 0.2 ) {
-        blendAmount = (slope - 0.2f) * (1.0f / (0.7f - 0.2f));
-        grass_rock = mix(rgColor, rockColor, blendAmount);
+    if ( slope < 0.6 && slope >= 0.4 ) {
+        blendAmount = (slope - 0.4f) * (1.0f / (0.6f - 0.4f));
+        base_color = mix(rgColor, rockColor, blendAmount);
     }
-    if (slope >= 0.7) grass_rock = rockColor;
+    if (slope >= 0.6) base_color = rockColor;
+/*
+    // getting dirty...
+    vec3 snow_color;
+    float delta = 0.1f;
+    float alt = 0.2f;
+    if (height_center > alt + delta) snow_color = snowColor;
+    else if (height_center < alt - delta) {
+        snow_color = base_color;
+    } else {
+        blendAmount = (height_center - alt - delta + 1.0f) / 2.0;
+        blendAmount /= (2.0 * delta);
+        snow_color = mix(base_color, snowColor, blendAmount);
+    } */
 
     vec3 light1 = normalize(vec3(1,3,0));
     vec3 ambient = vec3(0.1, 0.1, 0.2);
 
-    vec3 diffuse = grass_rock * clamp(dot(N, light1), 0, 1);
+    vec3 diffuse = base_color * clamp(dot(N, light1), 0, 1);
 /*
     float snowBlend = clamp((((height_center - 0.3)/0.5)+1)/2.0, 0, 1);
 
