@@ -4,11 +4,13 @@ in vec4 wpos;
 in vec2 uv;
 
 uniform sampler2D height_map;
-uniform sampler2D diffuse_map;
+uniform sampler2D grass_map;
+uniform sampler2D snow_map;
+uniform sampler2D rock_map;
 
 void main() {
 
-    float tiling_amount = 5;
+    float tiling_amount = 6;
 
     float height_center = texture(height_map, uv).r;
 
@@ -20,11 +22,23 @@ void main() {
 
     vec3 N = normalize(cross(b,a)); // Calculate normal from height differences
 
+    float normalAngle = acos(dot(vec3(0,1,0), N));
+
     vec3 light = normalize(vec3(1,3,0));
 
     vec3 ambient = vec3(0.1, 0.1, 0.2);
-    vec3 diffuse = texture(diffuse_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1);
 
+    float snowBlend = clamp((((height_center - 0.4)/0.2)+1)/2.0, 0, 1);
+
+    vec3 diffuse = texture(rock_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * (1.0-snowBlend)
+             + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * snowBlend/1.1;
+
+    if (normalAngle < 1.0) { // if normal is < 20degrees to vertical, 0, show stone.
+        diffuse = texture(grass_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * (1.0-snowBlend)
+                 + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * snowBlend;
+    }
+
+	//vec3 specular = pow(dot(N, H), 100);
 
     //vec3 specular = vec3(0.0,0.0,0.0);
     // Optional TODO: add specular term

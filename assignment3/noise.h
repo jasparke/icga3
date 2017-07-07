@@ -16,6 +16,7 @@ inline float rand01() {
     return ((float) std::rand())/((float) RAND_MAX);
 }
 
+
 inline GLuint generate_noise() {
 
     int width = 512;

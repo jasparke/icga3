@@ -8,7 +8,9 @@ protected:
     GLuint _vao; ///< vertex array object
     GLuint _pid; ///< GLSL shader program ID
     GLuint _height_tex;
-    GLuint _diffuse_tex;
+    GLuint _grass_tex;
+    GLuint _snow_tex;
+    GLuint _rock_tex;
 
     const std::string filename = "Mesh/grid.obj";
     OpenGP::SurfaceMesh mesh;
@@ -74,11 +76,14 @@ public:
         glUniform1i(tex_id, 0);
         check_error_gl();
 
+
         OpenGP::EigenImage<vec3> image;
+
+    //grass
         OpenGP::imread("grass.tga", image);
 
-        glGenTextures(1, &_diffuse_tex);
-        glBindTexture(GL_TEXTURE_2D, _diffuse_tex);
+        glGenTextures(1, &_grass_tex);
+        glBindTexture(GL_TEXTURE_2D, _grass_tex);
 
         check_error_gl();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -91,9 +96,53 @@ public:
                      GL_RGB, GL_FLOAT, image.data());
         check_error_gl();
 
-        tex_id = glGetUniformLocation(_pid, "diffuse_map");
+        tex_id = glGetUniformLocation(_pid, "grass_map");
         check_error_gl();
         glUniform1i(tex_id, 1);
+        check_error_gl();
+
+
+    //snow
+        OpenGP::imread("snow.tga", image);
+
+        glGenTextures(1, &_snow_tex);
+        glBindTexture(GL_TEXTURE_2D, _snow_tex);
+
+        check_error_gl();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        check_error_gl();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F,
+                     image.cols(), image.rows(), 0,
+                     GL_RGB, GL_FLOAT, image.data());
+        check_error_gl();
+
+        tex_id = glGetUniformLocation(_pid, "snow_map");
+        check_error_gl();
+        glUniform1i(tex_id, 2);
+        check_error_gl();
+    //rock
+        OpenGP::imread("rock.tga", image);
+
+        glGenTextures(1, &_rock_tex);
+        glBindTexture(GL_TEXTURE_2D, _rock_tex);
+
+        check_error_gl();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        check_error_gl();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F,
+                     image.cols(), image.rows(), 0,
+                     GL_RGB, GL_FLOAT, image.data());
+        check_error_gl();
+
+        tex_id = glGetUniformLocation(_pid, "rock_map");
+        check_error_gl();
+        glUniform1i(tex_id, 3);
         check_error_gl();
 
         glUseProgram(0);
@@ -104,7 +153,6 @@ public:
         glUseProgram(_pid);
         glBindVertexArray(_vao);
         check_error_gl();
-
         ///--- Vertex Attribute ID for Positions
         GLint vpoint_id = glGetAttribLocation(_pid, "vpoint");
         glEnableVertexAttribArray(vpoint_id);
@@ -116,7 +164,16 @@ public:
         glBindTexture(GL_TEXTURE_2D, _height_tex);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, _diffuse_tex);
+        glBindTexture(GL_TEXTURE_2D, _grass_tex);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, _snow_tex);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, _rock_tex);
+
+
+
 
         ///--- Set the MVP to vshader
         glUniformMatrix4fv(glGetUniformLocation(_pid, "MODEL"), 1, GL_FALSE, Model.data());
