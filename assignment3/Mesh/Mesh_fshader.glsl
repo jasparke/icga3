@@ -8,27 +8,43 @@ uniform sampler2D height_map;
 uniform sampler2D grass_map;
 uniform sampler2D snow_map;
 uniform sampler2D rock_map;
+uniform sampler2D rg_map;
 
 void main() {
 
     float tiling_amount = 15;
 
     float height_center = texture(height_map, uv).r;
-
     float height_plus_u = textureOffset(height_map, uv, ivec2(1,0)).r;
     float height_plus_v = textureOffset(height_map, uv, ivec2(0,1)).r;
     vec2 pxs = 2.0/textureSize(height_map, 0);
     vec3 a = vec3(pxs.x,height_plus_u - height_center, 0);
     vec3 b = vec3(0, height_plus_v - height_center, pxs.y);
-
     vec3 N = normalize(cross(b,a)); // Calculate normal from height differences
+    float slope = 1.0f - N.z;
+    float blendAmount;
 
-    float normalAngle = acos(dot(vec3(0,1,0), N));
+    vec3 snowColor = texture(snow_map, uv * tiling_amount).rgb;
+    vec3 grassColor = texture(grass_map, uv * tiling_amount).rgb;
+    vec3 rockColor = texture(rock_map, uv * tiling_amount).rgb;
+    vec3 rgColor = texture(rg_map, uv * tiling_amount).rgb;
+
+    vec3 grass_rock;
+    if (slope < 0.2) {
+        blendAmount = slope / 0.2f;
+        grass_rock = mix(grassColor, rgColor, blendAmount);
+    }
+    if ( slope < 0.7 && slope >= 0.2 ) {
+        blendAmount = (slope - 0.2f) * (1.0f / (0.7f - 0.2f));
+        grass_rock = mix(rgColor, rockColor, blendAmount);
+    }
+    if (slope >= 0.7) grass_rock = rockColor;
 
     vec3 light1 = normalize(vec3(1,3,0));
-
     vec3 ambient = vec3(0.1, 0.1, 0.2);
 
+    vec3 diffuse = grass_rock * clamp(dot(N, light1), 0, 1);
+/*
     float snowBlend = clamp((((height_center - 0.3)/0.5)+1)/2.0, 0, 1);
 
     vec3 diffuse = texture(rock_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * (1.0-snowBlend)
@@ -37,7 +53,7 @@ void main() {
     if (normalAngle < 1.0) { // if normal is < 20degrees to vertical, 0, show stone.
         diffuse = texture(grass_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * (1.0-snowBlend)
                  + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * snowBlend;
-    }
+    } */
 
 	//vec3 specular = pow(dot(N, H), 100);
 

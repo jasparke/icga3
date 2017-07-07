@@ -11,6 +11,7 @@ protected:
     GLuint _grass_tex;
     GLuint _snow_tex;
     GLuint _rock_tex;
+    GLuint _rg_tex;
 
     const std::string filename = "Mesh/grid.obj";
     OpenGP::SurfaceMesh mesh;
@@ -144,6 +145,27 @@ public:
         check_error_gl();
         glUniform1i(tex_id, 3);
         check_error_gl();
+	//grassrock
+		OpenGP::imread("rockgrass.tga", image);
+
+		glGenTextures(1, &_rg_tex);
+		glBindTexture(GL_TEXTURE_2D, _snow_tex);
+
+		check_error_gl();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		check_error_gl();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F,
+					 image.cols(), image.rows(), 0,
+					 GL_RGB, GL_FLOAT, image.data());
+		check_error_gl();
+
+		tex_id = glGetUniformLocation(_pid, "rg_map");
+		check_error_gl();
+		glUniform1i(tex_id, 4);
+		check_error_gl();
 
         glUseProgram(0);
 
@@ -172,6 +194,8 @@ public:
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, _rock_tex);
 
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, _rg_tex);
 
 
 
