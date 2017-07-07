@@ -46,7 +46,7 @@ inline GLuint generate_noise() {
             noise_data[i + j * height] = 0;
         }
     }
-    int period = 256;
+    int period = 128;
     float frequency = 1.0f / period;
     float amp = 1.0;
     for (int k = 0; k < 6; k++) {

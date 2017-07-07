@@ -25,18 +25,18 @@ void main() {
 
     float normalAngle = acos(dot(vec3(0,1,0), N));
 
-    //vec3 light = normalize(vec3(1,3,0));
+    vec3 light1 = normalize(vec3(1,3,0));
 
     vec3 ambient = vec3(0.1, 0.1, 0.2);
 
     float snowBlend = clamp((((height_center - 0.4)/0.2)+1)/2.0, 0, 1);
 
-    vec3 diffuse = texture(rock_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * (1.0-snowBlend)
-             + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * snowBlend/1.1;
+    vec3 diffuse = texture(rock_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * (1.0-snowBlend)
+             + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * snowBlend/1.1;
 
     if (normalAngle < 1.0) { // if normal is < 20degrees to vertical, 0, show stone.
-        diffuse = texture(grass_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * (1.0-snowBlend)
-                 + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light), 0, 1) * snowBlend;
+        diffuse = texture(grass_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * (1.0-snowBlend)
+                 + texture(snow_map, uv * tiling_amount).rgb * clamp(dot(N, light1), 0, 1) * snowBlend;
     }
 
 	//vec3 specular = pow(dot(N, H), 100);
